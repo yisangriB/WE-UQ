@@ -1,5 +1,5 @@
-#ifndef WIND_EVENT_SELECTION_H
-#define WIND_EVENT_SELECTION_H
+#ifndef WIND_FORCE_SPECTRUM_H
+#define WIND_FORCE_SPECTRUM_H
 
 /* *****************************************************************************
 Copyright (c) 2016-2017, The Regents of the University of California (Regents).
@@ -40,62 +40,63 @@ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // Written: fmckenna
 
 #include <SimCenterAppWidget.h>
+#include <GeneralInformationWidget.h>
 
-#include <QGroupBox>
-#include <QVector>
-#include <ExpertCFD/CFDExpertWidget.h>
-#include <ExpertCFD/UI/CFDTemplateWidget.h>
-#include <RemoteService.h>
 
-class QComboBox;
-class QStackedWidget;
-class UserDefinedApplication;
-
+class SC_DoubleLineEdit;
+class SC_StringLineEdit;
+class SC_IntLineEdit;
+class InputWidgetParameters;
 class RandomVariablesContainer;
+class QComboBox;
+class QGridLayout;
+class QVBoxLayout;
+class QSpinBox;
+class QLineEdit;
+class LineEditRV;
+class QGroupBox;
+class QPushButton;
+class QLabel;
 
-class WindEventSelection : public  SimCenterAppWidget
+class WindForceSpectrum : public SimCenterAppWidget
 {
     Q_OBJECT
 public:
-    explicit WindEventSelection(RandomVariablesContainer *, RemoteService* remoteService, QWidget *parent = 0);
-    ~WindEventSelection();
+    explicit WindForceSpectrum(RandomVariablesContainer *theRandomVariableIW, QWidget *parent = 0);
+    ~WindForceSpectrum();
 
-    bool outputToJSON(QJsonObject &jsonObject);
-    bool inputFromJSON(QJsonObject &jsonObject);
-    bool outputAppDataToJSON(QJsonObject &jsonObject);
-    bool inputAppDataFromJSON(QJsonObject &jsonObject);
-    bool copyFiles(QString &destName);
-    bool supportsLocalRun() override;
-
+    bool outputToJSON(QJsonObject &rvObject);
+    bool inputFromJSON(QJsonObject &rvObject);
+    bool outputAppDataToJSON(QJsonObject &rvObject);
+    bool inputAppDataFromJSON(QJsonObject &rvObject);
+    bool copyFiles(QString &dirName);
+    void parseForceFile(QString filepath);
 signals:
-    void statusMessage(QString message);
-    void errorMessage(QString message);
-    void fatalMessage(QString message);
 
 public slots:
-   void eventSelectionChanged(const QString &arg1);
-   void sendStatusMessage(QString message);
-   void sendErrorMessage(QString message);
-   void sendFatalMessage(QString message);
+   void clear(void);
+   void chooseFileName(void);
 
 private:
-   QComboBox   *eventSelection;
-   QStackedWidget *theStackedWidget;
-   SimCenterAppWidget *theCurrentEvent;
+   void updateScale(void);
+   void checkStory(void);
 
-   SimCenterAppWidget *theDEDM_HRP_Widget;
-   SimCenterAppWidget *theLowRiseTPU_Widget;
-   SimCenterAppWidget *theStochasticModel;
-   SimCenterAppWidget *theExistingEvents;
-   SimCenterAppWidget *CFDExpertEventWidget;
-   SimCenterAppWidget *CFDBeginnerEventWidget;
-   SimCenterAppWidget *CFDTemplateEventWidget;
-   SimCenterAppWidget *theWindTunnelExperiment;
-   SimCenterAppWidget *theDigitalWindTunnel;
-   SimCenterAppWidget *theExperimentalWindForces;
-   SimCenterAppWidget *theWindForceSpectrum;
-
+   SC_DoubleLineEdit *modePercent;
+   SC_DoubleLineEdit *modelScale;
+   SC_DoubleLineEdit *fullScaleSpeed;
+   SC_DoubleLineEdit *fullScaleDuration;
+   QLabel *fullScaleSpeedUnit, *fileUnit, * modelScaleLabel;
+   SC_IntLineEdit *seed;
+   SC_StringLineEdit *filepath;
+   QString filename;
+   QLabel *msg;
+   GeneralInformationWidget *theGI;
    RandomVariablesContainer *theRandomVariablesContainer;
+   QStringList varNamesAndValues;
+   double fullH, fullW, fullD,dataH, dataW, dataD; // TODO???
+   int nstory;
+   QString myForceUnit, myLengthUnit;
+
 };
 
-#endif // WIND_EVENT_SELECTION_H
+#endif // WIND_TUNNEL_EXPERIMENT_H
